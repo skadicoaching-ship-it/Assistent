@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Assistent – Kunden &amp; Termine</title>
+  <meta name="theme-color" content="#2f6f5e">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Hauptnavigation">
+      <div class="brand"><img src="icon.svg" alt="" width="28" height="28"><span id="brandName">Assistent</span></div>
+      <a href="#/dashboard" data-nav="dashboard"><span class="ico">🏠</span><span>Übersicht</span></a>
+      <a href="#/kunden" data-nav="kunden"><span class="ico">👥</span><span>Kunden</span></a>
+      <a href="#/termine" data-nav="termine"><span class="ico">📅</span><span>Termine</span></a>
+      <a href="#/zahlungen" data-nav="zahlungen"><span class="ico">💶</span><span>Zahlungen</span></a>
+      <a href="#/einstellungen" data-nav="einstellungen"><span class="ico">⚙️</span><span>Einstellungen</span></a>
+    </nav>
+    <main id="view" tabindex="-1"></main>
+  </div>
+
+  <dialog id="modal">
+    <form id="modalForm" novalidate>
+      <header class="modal-head">
+        <h2 id="modalTitle"></h2>
+        <button type="button" class="icon-btn" data-action="closeModal" aria-label="Schließen">✕</button>
+      </header>
+      <div id="modalBody" class="modal-body"></div>
+      <footer class="modal-foot">
+        <button type="button" class="btn danger ghost" id="modalDelete" hidden>Löschen</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn ghost" data-action="closeModal">Abbrechen</button>
+        <button type="submit" class="btn primary" id="modalSubmit">Speichern</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
