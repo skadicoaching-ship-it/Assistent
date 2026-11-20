@@ -40,6 +40,15 @@
     </form>
   </dialog>
 
+  <dialog id="askDialog" class="ask">
+    <div class="modal-body" style="padding-top:18px"><p id="askText" style="margin:0"></p></div>
+    <footer class="modal-foot">
+      <span class="spacer"></span>
+      <button type="button" class="btn ghost" id="askCancel">Abbrechen</button>
+      <button type="button" class="btn primary" id="askOk">Ja</button>
+    </footer>
+  </dialog>
+
   <div id="toast" role="status" aria-live="polite"></div>
   <input type="file" id="importFile" accept="application/json,.json" hidden>
 

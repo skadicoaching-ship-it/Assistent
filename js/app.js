@@ -103,7 +103,7 @@ function save() {
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(db));
   } catch (e) {
-    alert('Speichern fehlgeschlagen: ' + e.message);
+    toast('Speichern fehlgeschlagen: ' + e.message);
   }
 }
 
@@ -220,9 +220,24 @@ $('#modalForm').addEventListener('submit', e => {
   const keepOpen = modalState.onSubmit(data, form) === false;
   if (!keepOpen) { closeModal(); render(); }
 });
-$('#modalDelete').addEventListener('click', () => {
-  if (modalState?.onDelete && modalState.onDelete() !== false) { closeModal(); render(); }
+$('#modalDelete').addEventListener('click', async () => {
+  const fn = modalState?.onDelete;
+  if (fn && (await fn()) !== false) { closeModal(); render(); }
 });
+
+/* Eigener Bestätigungsdialog (confirm() ist in eingebetteten Ansichten blockiert). */
+function ask(message, okLabel = 'Ja, fortfahren') {
+  return new Promise(resolve => {
+    const dlg = $('#askDialog');
+    $('#askText').textContent = message;
+    $('#askOk').textContent = okLabel;
+    const done = v => { dlg.close(); resolve(v); };
+    $('#askOk').onclick = () => done(true);
+    $('#askCancel').onclick = () => done(false);
+    dlg.oncancel = e => { e.preventDefault(); done(false); };
+    dlg.showModal();
+  });
+}
 
 /* ---------- Forms ---------- */
 function customerForm(c = null, preset = {}) {
@@ -261,8 +276,8 @@ function customerForm(c = null, preset = {}) {
       }
       save();
     },
-    onDelete: c ? () => {
-      if (!confirm(`„${custName(c)}“ mit allen Anwendungen löschen? Termine bleiben ohne Kundenzuordnung erhalten.`)) return false;
+    onDelete: c ? async () => {
+      if (!await ask(`„${custName(c)}“ mit allen Anwendungen löschen? Termine bleiben ohne Kundenzuordnung erhalten.`)) return false;
       db.customers = db.customers.filter(x => x.id !== c.id);
       db.sessions = db.sessions.filter(s => s.customerId !== c.id);
       db.appointments.forEach(a => { if (a.customerId === c.id) a.customerId = ''; });
@@ -311,8 +326,8 @@ function sessionForm(s = null, preset = {}) {
       save();
       toast('Anwendung gespeichert');
     },
-    onDelete: s ? () => {
-      if (!confirm('Diese Anwendung löschen?')) return false;
+    onDelete: s ? async () => {
+      if (!await ask('Diese Anwendung löschen?')) return false;
       db.sessions = db.sessions.filter(v => v.id !== s.id);
       save(); toast('Anwendung gelöscht');
     } : null,
@@ -342,8 +357,8 @@ function apptForm(a = null, preset = {}) {
       save();
       toast('Termin gespeichert');
     },
-    onDelete: a ? () => {
-      if (!confirm('Diesen Termin löschen?')) return false;
+    onDelete: a ? async () => {
+      if (!await ask('Diesen Termin löschen?')) return false;
       db.appointments = db.appointments.filter(v => v.id !== a.id);
       save(); toast('Termin gelöscht');
     } : null,
@@ -873,10 +888,10 @@ const actions = {
     s.paid = true; s.paidAt = today();
     save(); toast(`${money(s.price)} als bezahlt markiert`); render();
   },
-  togglePaid: d => {
+  togglePaid: async d => {
     const s = db.sessions.find(x => x.id === d.id);
     if (!s) return;
-    if (s.paid && !confirm('Zahlung zurücksetzen (wieder offen)?')) return;
+    if (s.paid && !await ask('Zahlung zurücksetzen (wieder offen)?')) return;
     s.paid = !s.paid; s.paidAt = s.paid ? today() : '';
     save(); render();
   },
@@ -907,15 +922,15 @@ const actions = {
     db.settings.categories.push({ id: uid(), name: 'Neue Kategorie', color: colors[db.settings.categories.length % colors.length] });
     save(); render();
   },
-  delCategory: d => {
+  delCategory: async d => {
     const used = db.appointments.filter(a => a.category === d.id).length;
     if (db.settings.categories.length <= 1) { toast('Mindestens eine Kategorie wird benötigt'); return; }
-    if (!confirm(used ? `Diese Kategorie wird von ${used} Termin(en) verwendet. Trotzdem löschen?` : 'Kategorie löschen?')) return;
+    if (!await ask(used ? `Diese Kategorie wird von ${used} Termin(en) verwendet. Trotzdem löschen?` : 'Kategorie löschen?')) return;
     db.settings.categories = db.settings.categories.filter(c => c.id !== d.id);
     save(); render();
   },
   addService: () => { db.settings.services.push({ id: uid(), name: 'Neue Leistung', price: 0, duration: 60 }); save(); render(); },
-  delService: d => { if (!confirm('Leistung löschen?')) return; db.settings.services = db.settings.services.filter(v => v.id !== d.id); save(); render(); },
+  delService: async d => { if (!await ask('Leistung löschen?')) return; db.settings.services = db.settings.services.filter(v => v.id !== d.id); save(); render(); },
   exportData: () => {
     db.settings.lastBackup = today();
     save();
@@ -931,16 +946,28 @@ const actions = {
     });
     download(`kunden-${today()}.csv`, '﻿' + [cols.map(q).join(';'), ...rows].join('\r\n'), 'text/csv');
   },
-  importData: () => $('#importFile').click(),
-  wipe: () => {
-    if (!confirm('Wirklich ALLE Kunden, Anwendungen und Termine löschen? Das kann nicht rückgängig gemacht werden.')) return;
-    if (!confirm('Letzte Sicherheitsabfrage: Hast du ein Backup? Jetzt endgültig löschen?')) return;
+  importData: () => openModal({
+    title: 'Backup einspielen',
+    body: `<p class="small muted" style="margin-top:0">Backup-Datei auswählen oder den kopierten Backup-Text einfügen.</p>
+      <p><button type="button" class="btn" onclick="document.getElementById('importFile').click()">Datei auswählen …</button></p>
+      <textarea id="importText" name="importText" placeholder='{"version":1,"customers":[…]}' style="min-height:160px;font-family:ui-monospace,monospace;font-size:.8rem"></textarea>`,
+    submitLabel: 'Einspielen',
+    onSubmit: d => {
+      if (!d.importText) { toast('Bitte Backup-Text einfügen oder Datei wählen'); return false; }
+      closeModal();
+      importFromText(d.importText);
+      return false;
+    },
+  }),
+  wipe: async () => {
+    if (!await ask('Wirklich ALLE Kunden, Anwendungen und Termine löschen? Das kann nicht rückgängig gemacht werden.')) return;
+    if (!await ask('Letzte Sicherheitsabfrage: Hast du ein Backup? Jetzt endgültig löschen?')) return;
     const settings = db.settings;
     db = emptyData(); db.settings = settings;
     save(); toast('Alle Daten gelöscht'); location.hash = '#/dashboard'; render();
   },
-  loadDemo: () => {
-    if (db.customers.length && !confirm('Beispieldaten zu deinen vorhandenen Daten hinzufügen?')) return;
+  loadDemo: async () => {
+    if (db.customers.length && !await ask('Beispieldaten zu deinen vorhandenen Daten hinzufügen?')) return;
     addDemoData(); save(); toast('Beispieldaten geladen'); render();
   },
 };
@@ -988,23 +1015,15 @@ $('#importFile').addEventListener('change', e => {
   e.target.value = '';
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      if (!Array.isArray(data.customers)) throw new Error('Keine gültige Backup-Datei');
-      if (!confirm(`Backup mit ${data.customers.length} Kunden einspielen? Die aktuellen Daten auf diesem Gerät werden ersetzt.`)) return;
-      db = normalize(data);
-      save(); toast('Backup eingespielt'); render();
-    } catch (err) {
-      alert('Import fehlgeschlagen: ' + err.message);
-    }
-  };
+  reader.onload = () => { if ($('#modal').open) closeModal(); importFromText(reader.result); };
   reader.readAsText(file);
 });
 
 $('#modal').addEventListener('close', () => { modalState = null; });
 
+const embedded = (() => { try { return window.top !== window.self; } catch { return true; } })();
 function download(name, content, type) {
+  if (embedded) { showExport(name, content); return; }
   const blob = new Blob([content], { type });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -1012,6 +1031,38 @@ function download(name, content, type) {
   document.body.appendChild(a);
   a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+function showExport(name, content) {
+  openModal({
+    title: name.endsWith('.csv') ? 'Kundenliste (CSV)' : 'Backup',
+    body: `<p class="small muted" style="margin-top:0">Downloads sind in dieser Ansicht nicht möglich. Kopiere den Text und speichere ihn z. B. in einer Notiz oder Datei <b>${esc(name)}</b>. Zum Wiederherstellen: Einstellungen → „Backup einspielen“ → Text einfügen.</p>
+      <textarea id="exportText" readonly style="min-height:220px;font-family:ui-monospace,monospace;font-size:.8rem">${esc(content.replace(/^\ufeff/, ''))}</textarea>`,
+    submitLabel: 'Kopieren',
+    onSubmit: () => {
+      const ta = $('#exportText');
+      navigator.clipboard?.writeText(ta.value).then(() => toast('In die Zwischenablage kopiert'))
+        .catch(() => { ta.focus(); ta.select(); toast('Text markiert – jetzt kopieren'); });
+      if (!navigator.clipboard) { ta.focus(); ta.select(); toast('Text markiert – jetzt kopieren'); }
+      return false;
+    },
+  });
+}
+
+function importFromText(text) {
+  return (async () => {
+    try {
+      const data = JSON.parse(text);
+      if (!Array.isArray(data.customers)) throw new Error('Keine gültige Backup-Datei');
+      if (!await ask(`Backup mit ${data.customers.length} Kunden einspielen? Die aktuellen Daten auf diesem Gerät werden ersetzt.`, 'Einspielen')) return false;
+      db = normalize(data);
+      save(); toast('Backup eingespielt'); render();
+      return true;
+    } catch (err) {
+      toast('Import fehlgeschlagen: ' + err.message);
+      return false;
+    }
+  })();
 }
 
 /* ---------- Demo data ---------- */
