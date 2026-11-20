@@ -1,0 +1,88 @@
+# ─────────────────────────────────────────────────────────────
+#  Brand-Profil – hier passt du alles an. Der Assistent liest
+#  diese Datei bei jedem Lauf.
+# ─────────────────────────────────────────────────────────────
+
+brand:
+  name: "Skadi"                     # TODO: dein Markenname
+  handle: "@skadi"                  # TODO: dein Insta/TikTok-Handle
+  blog_url: ""                      # TODO: z.B. https://dein-blog.de
+  language: de
+  anrede: du                        # du | Sie
+  tone: >
+    warm, mystisch, ermutigend, nahbar. Keine Angstmacherei, keine
+    Heil- oder Erfolgsversprechen. Spiritualität als Werkzeug für
+    Selbstreflexion, nicht als Ersatz für Ärzte, Therapie oder Anwälte.
+
+angebot:
+  - Kartenlegungen (Tarot / Orakel)
+  - Rituale (Mond, Neuanfang, Schutz, Loslassen, Selbstliebe)
+  - PDF-Downloads im Blog (Ritual-Anleitungen, Journal-Prompts, Spreads)
+  - Produktempfehlungen via Amazon-Partnerlinks (Karten, Kerzen, Kristalle, Räucherwerk, Journals)
+
+# Vorschlag – du hast gesagt, die Zielgruppe ist noch offen.
+# Der Assistent testet diese drei Personas und wertet aus, welche zieht.
+zielgruppe:
+  - id: suchende
+    name: "Die Suchende (25–40)"
+    beschreibung: >
+      Steht vor Entscheidungen (Job, Beziehung, Umzug), will Klarheit
+      und Orientierung. Sucht nach "Tarot Liebe", "Karte des Tages",
+      "Entscheidung treffen Tarot".
+    kauft: Kartenlegung, Entscheidungs-Spread-PDF
+  - id: einsteigerin
+    name: "Die Einsteigerin (20–35)"
+    beschreibung: >
+      Neugierig auf Tarot, Mondrituale, Kristalle. Will selbst lernen.
+      Sucht "Tarot für Anfänger", "Vollmond Ritual", "Kristalle Bedeutung".
+    kauft: Anfänger-PDFs, Tarot-Decks & Kristalle (Amazon)
+  - id: selfcare
+    name: "Die Self-Care-Frau (30–50)"
+    beschreibung: >
+      Gestresst, will mehr Ruhe und Rituale im Alltag. Sucht
+      "Morgenritual", "Energie reinigen", "Journaling Prompts".
+    kauft: Ritual-PDFs, Kerzen, Räucherwerk, Journals (Amazon)
+
+content_pillars:      # Mischung pro Tag bei 5 Pins
+  - id: karte_des_tages
+    label: "Kartenbotschaft"
+  - id: ritual
+    label: "Ritual"
+  - id: lernen
+    label: "Tarot lernen"
+  - id: produkt
+    label: "Mystische Fundstücke"   # Amazon-Pins
+  - id: pdf
+    label: "Gratis & PDF"           # Blog-PDF-Pins
+
+pinterest:
+  pins_per_day: 5
+  plan_ahead_days: 7        # so viele Tage im Voraus wird geplant
+  post_times: ["08:15", "11:45", "15:30", "19:00", "21:30"]   # Europe/Berlin
+  timezone: Europe/Berlin
+  # Öffentliche Basis-URL, unter der die Bilder/Videos abrufbar sind
+  # (nötig für Pinterest-CSV-Upload & Instagram). Beispiel bei öffentlichem Repo:
+  # https://raw.githubusercontent.com/skadicoaching-ship-it/Assistent/main
+  media_base_url: ""
+  boards:                   # TODO: exakte Board-Namen aus deinem Account
+    karte_des_tages: "Tarot Karte des Tages"
+    ritual: "Rituale & Mondmagie"
+    lernen: "Tarot lernen für Anfänger"
+    produkt: "Mystische Fundstücke"
+    pdf: "Spirituelle Downloads & PDFs"
+
+video:
+  per_day: 1                # Reels/TikToks pro Tag
+  formats: [pick_a_card, ritual_steps, card_meaning]
+
+compliance:
+  affiliate_hinweis: "*Werbung: Affiliate-Link. Beim Kauf erhalte ich eine kleine Provision – für dich ändert sich nichts am Preis."
+  disclaimer: "Kartenlegen dient der Selbstreflexion und Unterhaltung und ersetzt keine ärztliche, psychologische oder rechtliche Beratung."
+
+design:
+  themes:
+    nacht:   {bg: ["#1b1033", "#3a1f5d"], accent: "#d9b56c", text: "#f6efe3"}
+    mond:    {bg: ["#0f1c2e", "#2c4a6e"], accent: "#e6d3a3", text: "#f3f1ec"}
+    rose:    {bg: ["#3b1a2a", "#7a3b55"], accent: "#f0c9a0", text: "#fbf3ee"}
+    salbei:  {bg: ["#1d2b26", "#3f5a4c"], accent: "#e2c98f", text: "#f4f1e8"}
+    sand:    {bg: ["#f3e9dc", "#e0cdb4"], accent: "#8a5a2b", text: "#2e2117"}
