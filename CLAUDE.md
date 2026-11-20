@@ -5,6 +5,25 @@ Rituale). Ziel: Reichweite auf Pinterest, Instagram und TikTok aufbauen und
 Besucher auf den Blog lenken (PDF-Verkauf + Amazon-Partnerlinks).
 Alle Markendaten stehen in `config/brand.yaml` – lies sie zuerst.
 
+**Die Inhaberin lädt alles selbst hoch.** Deine Aufgabe ist fertiger,
+upload-bereiter Content, der jeden Morgen um **06:00 Uhr (Europe/Berlin)**
+im Repo liegt. Nichts automatisch posten.
+
+## Aktueller Fokus (siehe `fokus` in brand.yaml)
+
+- Solange `fokus.bis_datum` nicht überschritten ist, bewerben
+  `fokus.pins_pro_tag` Pins pro Tag das Fokus-Produkt (Rauhnächte-Journal-PDF),
+  jeweils aus einem anderen Blickwinkel: Wunschritual, Jahresrückblick,
+  Journaling-Fragen, Räuchern, Vorfreude/Countdown bis 25.12., Geschenkidee,
+  "Was sind die Rauhnächte?", Ruhe zwischen den Jahren. `link_type: "pdf"`,
+  `link_hint: "Rauhnächte-Journal PDF"`.
+- Jedes Video endet mit CTA zum Journal ("Mein Rauhnächte-Journal findest du
+  über den Link in der Bio").
+- Countdown nutzen: Tage bis 25.12. im Text erwähnen, ab 25.12. die jeweilige
+  Rauhnacht (1.–12.) und ihr Monatsthema aufgreifen.
+- Zielgruppe ist vorrangig `haupt_zielgruppe` (Self-Care-Frau 30–50):
+  gestresst, sehnt sich nach Ruhe, Ritualen und bewusstem Jahresabschluss.
+
 ## Tagesroutine
 
 1. **Trends recherchieren** (WebSearch, aktuelle Woche/Monat):
@@ -20,23 +39,24 @@ Alle Markendaten stehen in `config/brand.yaml` – lies sie zuerst.
 3. **Bauen**: `python3 -m assistant.build --all` (überspringt fertige Videos).
 4. **Prüfen**: Mindestens ein Pin-Bild pro neuem Tag ansehen (Text lesbar,
    nichts überlappt). Bei Problemen Headline kürzen und neu bauen.
-5. **Posten** (nur wenn Tokens vorhanden):
-   `python3 -m assistant.publish pinterest --due` – postet fällige Pins mit Link.
+5. Nicht posten – die Inhaberin lädt selbst hoch.
 6. **Commit & Push** der neuen Pläne, Bilder, Videos und Trend-Notizen.
 7. Kurze Zusammenfassung: welche Tage neu sind, welche Pins noch **keinen Link**
    haben (die trägt die Inhaberin selbst ein), welche Trends genutzt wurden.
 
 ## Regeln für Inhalte
 
-- 5 Pins pro Tag, je ein Pin pro Content-Pillar (`karte_des_tages`, `ritual`,
-  `lernen`, `produkt`, `pdf`). Themes abwechseln, nie zwei gleiche nebeneinander.
+- 5 Pins pro Tag. Während des Fokus: 3 Fokus-Pins (Pillars `pdf`, `ritual`,
+  `selfcare`, alle mit Ziel Journal) + 1 `karte_des_tages` + 1 `produkt`
+  (Amazon: Journals, Kerzen, Räucherwerk, Tarot-/Orakeldecks).
+  Ohne Fokus: je ein Pin pro Pillar. Themes abwechseln, nie zwei gleiche nebeneinander.
 - `link` immer leer lassen – Links trägt die Inhaberin ein. In `link_hint`
   schreiben, wohin der Pin idealerweise führen soll.
 - Pinterest ist eine Suchmaschine: Titel ≤ 100 Zeichen mit Hauptsuchbegriff
   vorne, Beschreibung 250–500 Zeichen, natürlich formuliert mit 3–5 Suchbegriffen,
   keine Hashtag-Wände. `alt_text` beschreibt das Bild.
 - Headline auf dem Bild: max. ~55 Zeichen, neugierig machend, Nutzen klar.
-- Zielgruppen-Personas aus `brand.yaml` abwechselnd ansprechen.
+- Vorrangig `haupt_zielgruppe` ansprechen.
 - Ton: warm, mystisch, ermutigend; Anrede laut `brand.anrede`.
 - **Verboten**: Heilversprechen, Garantien ("Er kommt garantiert zurück"),
   Angstmacherei, Gesundheits-/Finanz-/Rechtsratschläge, Abwertung anderer
@@ -62,7 +82,7 @@ Alle Markendaten stehen in `config/brand.yaml` – lies sie zuerst.
   "date": "YYYY-MM-DD",
   "trend_notes": ["…"],
   "pins": [{
-    "pillar": "karte_des_tages|ritual|lernen|produkt|pdf",
+    "pillar": "pdf|ritual|selfcare|karte_des_tages|produkt",
     "label": "Text oben auf dem Pin", "theme": "nacht|mond|rose|salbei|sand",
     "motif": "cards|ornament",
     "headline": "…", "subline": "…", "cta": "Button-Text",

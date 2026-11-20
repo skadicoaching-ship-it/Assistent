@@ -99,8 +99,8 @@ class Builder:
             if step:
                 f = font("sans", 34, "SemiBold")
                 s = f"SCHRITT {step}"
-                d.text(((W - f.getlength(s)) / 2, 470), s, font=f, fill=self.th["accent"])
-            y = _text_block(img, title, "serif", "Bold", W - 160, 420, 96, 540, self.th["text"], a, 1.05)
+                d.text(((W - f.getlength(s)) / 2, 690), s, font=f, fill=self.th["accent"])
+            y = _text_block(img, title, "serif", "Bold", W - 160, 420, 96, 760, self.th["text"], a, 1.05)
             ornament(d, W // 2, y + 40, 340, self.th["accent"])
             b = ease((t - 0.35) / 0.5)
             _text_block(img, body, "sans", "Regular", W - 200, 650, 48, y + 95, self.th["text"], b, 1.4, 32)

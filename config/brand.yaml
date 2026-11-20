@@ -20,8 +20,21 @@ angebot:
   - PDF-Downloads im Blog (Ritual-Anleitungen, Journal-Prompts, Spreads)
   - Produktempfehlungen via Amazon-Partnerlinks (Karten, Kerzen, Kristalle, Räucherwerk, Journals)
 
-# Vorschlag – du hast gesagt, die Zielgruppe ist noch offen.
-# Der Assistent testet diese drei Personas und wertet aus, welche zieht.
+# ── AKTUELLER FOKUS ──────────────────────────────────────────
+# Die meisten Inhalte bewerben dieses Produkt. Nach Ablauf (bis_datum)
+# wieder auf den normalen Mix wechseln oder neuen Fokus eintragen.
+fokus:
+  produkt: "Rauhnächte-Journal (PDF)"
+  beschreibung: >
+    Druckbares Journal für die 12 Rauhnächte (25.12.–6.1.) mit dem
+    13-Wünsche-Ritual, täglichen Journaling-Fragen, Räucher-Anleitung,
+    Jahresrückblick und Intentionen für das neue Jahr.
+  bis_datum: "2027-01-05"
+  pins_pro_tag: 3            # von 5 Pins führen 3 zum Journal
+  video_cta: true            # jedes Video endet mit Hinweis aufs Journal
+
+# Hauptzielgruppe: selfcare. Die anderen nur gelegentlich.
+haupt_zielgruppe: selfcare
 zielgruppe:
   - id: suchende
     name: "Die Suchende (25–40)"
@@ -44,16 +57,16 @@ zielgruppe:
     kauft: Ritual-PDFs, Kerzen, Räucherwerk, Journals (Amazon)
 
 content_pillars:      # Mischung pro Tag bei 5 Pins
-  - id: karte_des_tages
-    label: "Kartenbotschaft"
+  - id: pdf
+    label: "Rauhnächte-Journal"     # Fokus-Produkt / Blog-PDF
   - id: ritual
     label: "Ritual"
-  - id: lernen
-    label: "Tarot lernen"
+  - id: selfcare
+    label: "Self-Care & Journaling"
+  - id: karte_des_tages
+    label: "Kartenbotschaft"
   - id: produkt
-    label: "Mystische Fundstücke"   # Amazon-Pins
-  - id: pdf
-    label: "Gratis & PDF"           # Blog-PDF-Pins
+    label: "Mystische Fundstücke"   # Amazon: Journals, Kerzen, Räucherwerk
 
 pinterest:
   pins_per_day: 5
@@ -67,13 +80,17 @@ pinterest:
   boards:                   # TODO: exakte Board-Namen aus deinem Account
     karte_des_tages: "Tarot Karte des Tages"
     ritual: "Rituale & Mondmagie"
-    lernen: "Tarot lernen für Anfänger"
+    selfcare: "Self-Care & Journaling"
     produkt: "Mystische Fundstücke"
     pdf: "Spirituelle Downloads & PDFs"
 
 video:
   per_day: 1                # Reels/TikToks pro Tag
   formats: [pick_a_card, ritual_steps, card_meaning]
+
+ausgabe:
+  fertig_bis: "06:00"       # Europe/Berlin – Content muss dann bereitliegen
+  modus: manuell            # Inhaberin lädt selbst hoch, keine Auto-Posts
 
 compliance:
   affiliate_hinweis: "*Werbung: Affiliate-Link. Beim Kauf erhalte ich eine kleine Provision – für dich ändert sich nichts am Preis."

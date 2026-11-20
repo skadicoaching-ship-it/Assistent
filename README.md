@@ -1,5 +1,8 @@
 # Social-Media-Assistent (Pinterest · Instagram · TikTok)
 
+Liefert jeden Morgen bis **6:00 Uhr** fertigen Content zum Selbsthochladen.
+Aktueller Fokus: **Rauhnächte-Journal (PDF)**, Zielgruppe Self-Care-Frau.
+
 Recherchiert täglich Trends rund um Tarot, Kartenlegen & Rituale, plant
 **5 Pinterest-Pins pro Tag – 7 Tage im Voraus** (Bild + Titel + Beschreibung +
 Keywords + Alt-Text) und erstellt **1 Hochkant-Video pro Tag** für Reels und TikTok.
