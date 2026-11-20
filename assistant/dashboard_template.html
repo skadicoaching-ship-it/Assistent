@@ -1,0 +1,193 @@
+<title>Ritual Content-Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600&display=swap">
+<style>
+/* Layout: eine Spalte wie ein Ritual-Tagebuch – Tageswahl oben, darunter Pins in Posting-Reihenfolge, dann das Video. */
+:root {
+  --bg: #f5f0f7; --surface: #ffffff; --sunk: #ece4f1; --fg: #2a1d3d; --muted: #6b5c80;
+  --gold: #8e6418; --gold-soft: #f1e3c4; --line: #ddd1e6; --ok: #2f7a55;
+  --display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --body: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #150d24; --surface: #20163a; --sunk: #1a1130; --fg: #f3ece0; --muted: #b5a8c8;
+  --gold: #d9b56c; --gold-soft: #3a2c4a; --line: #33264d; --ok: #7ccf9f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #150d24; --surface: #20163a; --sunk: #1a1130; --fg: #f3ece0; --muted: #b5a8c8;
+  --gold: #d9b56c; --gold-soft: #3a2c4a; --line: #33264d; --ok: #7ccf9f; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font: 400 15px/1.55 var(--body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg) }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header h1 { font: 600 2.1rem/1.1 var(--display); margin: 0; text-wrap: balance }
+header p { margin: 6px 0 0; color: var(--muted); font-size: .85rem }
+.focus { display: inline-flex; gap: 6px; align-items: center; margin-top: 10px; padding: 4px 12px; border-radius: 99px;
+  background: var(--gold-soft); color: var(--gold); font-size: .78rem; font-weight: 600; letter-spacing: .03em }
+
+nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; gap: 8px; overflow-x: auto; padding-block: 14px; margin-top: 8px; border-bottom: 1px solid var(--line) }
+nav button { flex: none; font: 600 .85rem var(--body); padding: 8px 16px; border-radius: 99px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg) }
+nav button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg) }
+nav button small { font-weight: 500; opacity: .7; margin-left: 4px }
+
+.dayhead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 24px 0 4px }
+.dayhead h2 { font: 600 1.6rem/1.2 var(--display); margin: 0 }
+.progress { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums }
+h3 { font: 600 .75rem var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin: 28px 0 12px }
+
+.list { display: grid; gap: 14px }
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px;
+  display: grid; grid-template-columns: minmax(96px, 30%) 1fr; gap: 14px; }
+.item.done { opacity: .55 }
+.item img { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 8px; display: block; max-width: 100% }
+.body { min-width: 0; display: grid; gap: 10px; align-content: start }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: .78rem; color: var(--muted) }
+.meta b { color: var(--fg); font-variant-numeric: tabular-nums; font-size: .9rem }
+.chip { padding: 2px 8px; border-radius: 99px; background: var(--sunk); font-weight: 500 }
+.chip.f { background: var(--gold-soft); color: var(--gold); font-weight: 600 }
+.field { background: var(--sunk); border-radius: 10px; padding: 10px 12px; display: grid; gap: 6px }
+.field .k { display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600 }
+.field .v { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .88rem }
+.field .v.clamp { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden }
+.hint { font-size: .82rem; color: var(--muted) }
+.hint strong { color: var(--fg); font-weight: 600 }
+.actions { display: flex; flex-wrap: wrap; gap: 8px }
+button.b { font: 600 .78rem var(--body); padding: 7px 12px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg) }
+button.b.primary { background: var(--gold); border-color: var(--gold); color: var(--bg) }
+button.copy { font: 600 .7rem var(--body); letter-spacing: .04em; padding: 4px 10px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--gold); text-transform: none }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px }
+label.check { display: inline-flex; gap: 8px; align-items: center; font-size: .82rem; font-weight: 600; cursor: pointer }
+label.check input { width: 18px; height: 18px; accent-color: var(--ok) }
+
+.video { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 12px }
+.video video { width: 100%; max-height: 62vh; border-radius: 10px; background: #000; display: block }
+.empty { padding: 28px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 14px }
+footer { margin-top: 36px; font-size: .75rem; color: var(--muted) }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  background: var(--fg); color: var(--bg); padding: 10px 18px; border-radius: 99px; font-size: .85rem; font-weight: 600; z-index: 20 }
+@media (max-width: 460px) { .item { grid-template-columns: 1fr } .item img { width: 62%; margin: 0 auto } }
+@media (prefers-reduced-motion: no-preference) { .item, .video { transition: opacity .2s } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Ritual Content-Studio</h1>
+    <p id="gen"></p>
+    <span class="focus" id="focus" hidden></span>
+  </header>
+  <nav id="days" aria-label="Tag auswählen"></nav>
+  <main id="main"></main>
+  <footer id="foot"></footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>
+const DATA = JSON.parse(document.getElementById("data").textContent);
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)) } catch { return null } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} }
+};
+let downloads = null;
+(async () => { try { downloads = await window.claude?.use?.("downloads") } catch {} render() })();
+
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 1800);
+}
+async function copy(text, btn) {
+  try { await navigator.clipboard.writeText(text); toast("Kopiert") }
+  catch {
+    const v = btn.closest(".field")?.querySelector(".v");
+    if (v) { const r = document.createRange(); r.selectNodeContents(v); const s = getSelection(); s.removeAllRanges(); s.addRange(r) }
+    toast("Text markiert – jetzt kopieren");
+  }
+}
+function bytes(b64) { const s = atob(b64); const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u }
+async function save(filename, b64, type) {
+  if (!downloads) { toast(type === "img" ? "Bild lange gedrückt halten zum Sichern" : "Speichern ist hier nicht möglich"); return }
+  try { await downloads.save({ filename, data: new Blob([bytes(b64)]) }); toast("Gespeichert") }
+  catch (e) { if (e?.code !== "declined") toast(e?.code === "rate_limited" ? "Kurz warten, dann nochmal" : "Speichern nicht möglich") }
+}
+
+let day = 0;
+function doneKey(d, id) { return `done:${d}:${id}` }
+
+function field(label, text, clamp) {
+  return `<div class="field"><div class="k"><span>${label}</span><button class="copy" data-copy>Kopieren</button></div>
+    <div class="v${clamp ? " clamp" : ""}">${esc(text)}</div></div>`;
+}
+
+function render() {
+  const { meta, days } = DATA;
+  $("#gen").textContent = `Erstellt am ${meta.generated} Uhr`;
+  if (meta.focus) { $("#focus").hidden = false; $("#focus").textContent = `Fokus: ${meta.focus}` }
+  $("#foot").textContent = meta.disclaimer;
+  if (!days.length) { $("#main").innerHTML = `<div class="empty">Für heute ist noch kein Content da. Der Assistent legt ihn jeden Morgen bis 6 Uhr hier ab.</div>`; return }
+  day = Math.min(day, days.length - 1);
+  $("#days").innerHTML = days.map((d, i) => {
+    const total = d.pins.length + d.videos.length;
+    const done = [...d.pins.map(p => "p" + p.n), ...d.videos.map(v => v.id)].filter(id => store.get(doneKey(d.date, id))).length;
+    return `<button aria-pressed="${i === day}" data-day="${i}">${esc(d.label)}<small>${done}/${total}</small></button>`;
+  }).join("");
+  const d = days[day];
+  const total = d.pins.length + d.videos.length;
+  const done = [...d.pins.map(p => "p" + p.n), ...d.videos.map(v => v.id)].filter(id => store.get(doneKey(d.date, id))).length;
+
+  const pins = d.pins.map(p => {
+    const isDone = !!store.get(doneKey(d.date, "p" + p.n));
+    return `<article class="item${isDone ? " done" : ""}">
+      <img src="data:image/jpeg;base64,${p.img}" alt="${esc(p.alt)}">
+      <div class="body">
+        <div class="meta"><b>${esc(p.time)} Uhr</b><span class="chip${p.focus ? " f" : ""}">${esc(p.label)}</span><span>Board: ${esc(p.board)}</span></div>
+        ${field("Titel", p.title)}
+        ${field("Beschreibung", p.description, true)}
+        <div class="hint">Link einfügen: <strong>${esc(p.hint || p.linkType)}</strong></div>
+        <div class="actions">
+          <button class="b primary" data-save="${p.n}">Bild speichern</button>
+          <label class="check"><input type="checkbox" data-done="p${p.n}" ${isDone ? "checked" : ""}> Hochgeladen</label>
+        </div>
+      </div></article>`;
+  }).join("");
+
+  const vids = d.videos.map(v => {
+    const isDone = !!store.get(doneKey(d.date, v.id));
+    return `<article class="video${isDone ? " done" : ""}">
+      <video controls playsinline muted preload="metadata" src="data:video/mp4;base64,${v.mp4}"></video>
+      ${field("Caption & Hashtags", v.caption)}
+      ${field("Kommentar zum Anpinnen", v.comment)}
+      <div class="hint"><strong>Sound:</strong> ${esc(v.sound)}</div>
+      <div class="actions">
+        <button class="b primary" data-savev="${esc(v.id)}">Video speichern</button>
+        <label class="check"><input type="checkbox" data-done="${esc(v.id)}" ${isDone ? "checked" : ""}> Gepostet</label>
+      </div></article>`;
+  }).join("");
+
+  $("#main").innerHTML = `
+    <div class="dayhead"><h2>${esc(d.long)}</h2><span class="progress">${done} von ${total} erledigt</span></div>
+    <h3>Pinterest · ${d.pins.length} Pins</h3><div class="list">${pins || '<div class="empty">Keine Pins für diesen Tag.</div>'}</div>
+    <h3>Reel & TikTok</h3><div class="list">${vids || '<div class="empty">Kein Video für diesen Tag.</div>'}</div>`;
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("button, input"); if (!t) return;
+  const d = DATA.days[day];
+  if (t.dataset.day) { day = +t.dataset.day; store.set("day", d?.date); render(); scrollTo({ top: 0 }) }
+  else if (t.hasAttribute("data-copy")) copy(t.closest(".field").querySelector(".v").textContent, t);
+  else if (t.dataset.save) { const p = d.pins.find(x => x.n == t.dataset.save); save(p.file, p.img, "img") }
+  else if (t.dataset.savev) { const v = d.videos.find(x => x.id === t.dataset.savev); save(v.file, v.mp4, "video") }
+  else if (t.dataset.done) { store.set(doneKey(d.date, t.dataset.done), t.checked); render() }
+});
+render();
+</script>

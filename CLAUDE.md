@@ -39,7 +39,11 @@ im Repo liegt. Nichts automatisch posten.
 3. **Bauen**: `python3 -m assistant.build --all` (überspringt fertige Videos).
 4. **Prüfen**: Mindestens ein Pin-Bild pro neuem Tag ansehen (Text lesbar,
    nichts überlappt). Bei Problemen Headline kürzen und neu bauen.
-5. Nicht posten – die Inhaberin lädt selbst hoch.
+5. **Handy-Seite aktualisieren**: `python3 -m assistant.dashboard`, dann die
+   Seite mit dem Artifact-Tool auf die bestehende URL aus `dashboard.url`
+   veröffentlichen (vorher `action: "read"` mit dieser URL, dann `publish` mit
+   `url`, `file_path: dashboard/index.html`, `capabilities: {"downloads": true}`).
+   Nie eine neue URL anlegen. Nicht posten – die Inhaberin lädt selbst hoch.
 6. **Commit & Push** der neuen Pläne, Bilder, Videos und Trend-Notizen.
 7. Kurze Zusammenfassung: welche Tage neu sind, welche Pins noch **keinen Link**
    haben (die trägt die Inhaberin selbst ein), welche Trends genutzt wurden.
