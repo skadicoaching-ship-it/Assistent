@@ -1035,8 +1035,22 @@ $('#importFile').addEventListener('change', e => {
 $('#modal').addEventListener('close', () => { modalState = null; });
 
 const embedded = (() => { try { return window.top !== window.self; } catch { return true; } })();
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 function download(name, content, type) {
   if (embedded) { showExport(name, content); return; }
+  if (isIOS) {
+    try {
+      const file = new File([content], name, { type });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: name })
+          .then(() => toast('Backup gesichert'))
+          .catch(err => { if (err && err.name !== 'AbortError') showExport(name, content); });
+        return;
+      }
+    } catch (e) { /* weiter mit Text-Anzeige */ }
+    showExport(name, content);
+    return;
+  }
   const blob = new Blob([content], { type });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -1049,7 +1063,7 @@ function download(name, content, type) {
 function showExport(name, content) {
   openModal({
     title: name.endsWith('.csv') ? 'Kundenliste (CSV)' : 'Backup',
-    body: `<p class="small muted" style="margin-top:0">Downloads sind in dieser Ansicht nicht möglich. Kopiere den Text und speichere ihn z. B. in einer Notiz oder Datei <b>${esc(name)}</b>. Zum Wiederherstellen: Einstellungen → „Backup einspielen“ → Text einfügen.</p>
+    body: `<p class="small muted" style="margin-top:0">Ein Download ist hier nicht möglich. Kopiere den Text und speichere ihn z. B. in einer Notiz oder Datei <b>${esc(name)}</b>. Zum Wiederherstellen: Einstellungen → „Backup einspielen“ → Text einfügen.</p>
       <textarea id="exportText" readonly style="min-height:220px;font-family:ui-monospace,monospace;font-size:.8rem">${esc(content.replace(/^\ufeff/, ''))}</textarea>`,
     submitLabel: 'Kopieren',
     onSubmit: () => {
