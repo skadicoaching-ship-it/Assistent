@@ -1,6 +1,6 @@
 // Offline-Cache: App funktioniert auch ohne Internet.
-const CACHE = 'assistent-v1';
-const FILES = ['./', './index.html', './css/style.css', './js/app.js', './icon.svg', './manifest.webmanifest'];
+const CACHE = 'assistent-v2';
+const FILES = ['./', './index.html', './css/style.css', './js/app.js', './icon.svg', './manifest.webmanifest', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
