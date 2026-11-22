@@ -429,6 +429,7 @@ views.dashboard = () => {
       <button class="btn primary" data-action="newAppt">+ Termin</button>
     </div>
   </div>
+  ${backupReminder()}
   <div class="grid grid-kpi">
     <a class="card kpi" href="#/termine"><div class="val">${todayCount}</div><div class="lbl">Termine heute</div></a>
     <a class="card kpi ${fu.some(f => f.overdue) ? 'danger' : fu.length ? 'warn' : ''}" href="#/kunden?f=nachfassen"><div class="val">${fu.length}</div><div class="lbl">Nachfassen</div></a>
@@ -463,6 +464,18 @@ views.dashboard = () => {
     </section>
   </div>`;
 };
+
+function backupReminder() {
+  if (!db.customers.length) return '';
+  const last = db.settings.lastBackup;
+  const days = last ? diffDays(today(), last) : null;
+  if (days !== null && days < 14) return '';
+  return `<div class="followup-box" style="margin-bottom:16px">
+    <div class="main"><b>💾 ${last ? `Letztes Backup vor ${days} Tagen` : 'Noch kein Backup erstellt'}</b>
+    <div class="small">Deine Daten liegen nur auf diesem Gerät. Ein Backup schützt sie, falls etwas mit dem Gerät passiert.</div></div>
+    <button class="btn sm primary" data-action="exportData">Backup jetzt</button>
+  </div>`;
+}
 
 function apptRow(a) {
   const cat = category(a.category);
@@ -1104,6 +1117,8 @@ function addDemoData() {
 }
 
 /* ---------- Start ---------- */
+// Browser bitten, die Daten dauerhaft zu behalten (nicht automatisch aufräumen).
+try { navigator.storage?.persist?.().catch(() => {}); } catch (e) { /* ignorieren */ }
 render();
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
