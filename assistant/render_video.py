@@ -18,7 +18,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from .design import (card_back, config, draw_centered, draw_stars, fit_text, font, gradient, hex_rgb, moon, ornament,
+from .design import (draw_motif, card_back, config, draw_centered, draw_stars, fit_text, font, gradient, hex_rgb, moon, ornament,
                      stars, theme)
 
 W, H, FPS = 1080, 1920, 30
@@ -70,6 +70,12 @@ class Builder:
         self.scenes: list[tuple[float, callable]] = []
         brand = config()["brand"]
         self.handle = brand.get("handle") or brand.get("name")
+        self.motif = spec.get("motif")
+        self.motifs = spec.get("slide_motifs") or []
+        self._slide_i = 0
+
+    def slide_motif(self):
+        return self.motifs[self._cur % len(self.motifs)] if self.motifs else self.motif
 
     def base(self, t):
         img = self.bg.copy()
@@ -86,15 +92,25 @@ class Builder:
     def hook(self, text, dur=2.8):
         def fn(img, t, T):
             a = ease(t / 0.5)
-            moon(ImageDraw.Draw(img), W / 2, 520, 60 * a + 1, self.th["accent"], self.th["bg"][0])
-            _text_block(img, text, "serif", "Bold", W - 160, 700, 118, 680 - int(30 * a), self.th["text"], a, 1.05)
+            if self.motif:
+                sz = int(420 * (0.85 + 0.15 * a))
+                draw_motif(img, self.motif, W / 2, 520, sz, self.th["accent"], self.th["bg"][0])
+                _text_block(img, text, "serif", "Bold", W - 160, 600, 112, 820 - int(30 * a), self.th["text"], a, 1.05)
+            else:
+                moon(ImageDraw.Draw(img), W / 2, 520, 60 * a + 1, self.th["accent"], self.th["bg"][0])
+                _text_block(img, text, "serif", "Bold", W - 160, 700, 118, 680 - int(30 * a), self.th["text"], a, 1.05)
         self.add(dur, fn)
 
     def slide(self, title, body, step=None, dur=None):
         dur = dur or max(3.2, min(6.5, 1.6 + len(body) / 22))
+        idx = self._slide_i
+        self._slide_i += 1
 
         def fn(img, t, T):
             a = ease(t / 0.45)
+            if self.motif:
+                self._cur = idx
+                draw_motif(img, self.slide_motif(), W / 2, 470, 200, self.th["accent"], self.th["bg"][0])
             d = ImageDraw.Draw(img)
             if step:
                 f = font("sans", 34, "SemiBold")
@@ -145,6 +161,8 @@ class Builder:
     def cta(self, text, dur=3.2):
         def fn(img, t, T):
             a = ease(t / 0.5)
+            if self.motif:
+                draw_motif(img, self.motif, W / 2, 470, 260, self.th["accent"], self.th["bg"][0])
             y = _text_block(img, text, "serif", "Bold", W - 180, 600, 92, 700, self.th["text"], a, 1.08)
             d = ImageDraw.Draw(img)
             ornament(d, W // 2, y + 50, 380, self.th["accent"])

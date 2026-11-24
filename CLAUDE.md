@@ -87,8 +87,8 @@ im Repo liegt. Nichts automatisch posten.
   "trend_notes": ["…"],
   "pins": [{
     "pillar": "pdf|ritual|selfcare|karte_des_tages|produkt",
-    "label": "Text oben auf dem Pin", "theme": "nacht|mond|rose|salbei|sand",
-    "motif": "cards|ornament",
+    "label": "Text oben auf dem Pin", "theme": "nacht|mond|rose|salbei|sand|schwarzgold",
+    "motif": "cards|ornament|moon|owl|gemini",
     "headline": "…", "subline": "…", "cta": "Button-Text",
     "title": "Pinterest-Titel", "description": "…", "keywords": ["…"],
     "alt_text": "…", "link_type": "blog|pdf|amazon", "link_hint": "…", "link": ""

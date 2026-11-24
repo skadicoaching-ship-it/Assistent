@@ -6,7 +6,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from .design import (config, draw_centered, draw_stars, fit_text, font, gradient, hex_rgb, moon, ornament, stars, theme,
+from .design import (draw_motif, config, draw_centered, draw_stars, fit_text, font, gradient, hex_rgb, moon, ornament, stars, theme,
                      card_back)
 
 W, H = 1000, 1500
@@ -32,11 +32,18 @@ def render_pin(pin: dict, out: Path) -> Path:
         spaced = "  ".join(label.split())
         lw = f.getlength(spaced)
         d.text(((W - lw) / 2, 120), spaced, font=f, fill=acc)
-    moon(d, W / 2, 215, 30, acc, th["bg"][0])
+    if pin.get("motif") not in ("owl", "moon", "gemini"):
+        moon(d, W / 2, 215, 30, acc, th["bg"][0])
 
     # Motiv-Element: Karten oder Ornament
     motif_top = 290
-    if pin.get("motif", "cards") == "cards":
+    motif = pin.get("motif", "cards")
+    if motif in ("owl", "moon", "gemini"):
+        img = img.convert("RGBA")
+        draw_motif(img, motif, W / 2, motif_top + 150, 300, acc, th["bg"][0])
+        d = ImageDraw.Draw(img, "RGBA")
+        text_top = motif_top + 340
+    elif motif == "cards":
         cw, ch = 170, 285
         back = card_back(cw, ch, acc, th["bg"][0])
         for i, (dx, rot) in enumerate([(-170, 10), (0, 0), (170, -10)]):
@@ -76,5 +83,5 @@ def render_pin(pin: dict, out: Path) -> Path:
     d.text(((W - f4.getlength(sig)) / 2, H - 125), sig, font=f4, fill=(ar, ag, ab, 230))
 
     out.parent.mkdir(parents=True, exist_ok=True)
-    img.save(out, "PNG", optimize=True)
+    img.convert("RGB").save(out, "PNG", optimize=True)
     return out

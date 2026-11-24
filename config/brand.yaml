@@ -103,6 +103,7 @@ design:
     rose:    {bg: ["#3b1a2a", "#7a3b55"], accent: "#f0c9a0", text: "#fbf3ee"}
     salbei:  {bg: ["#1d2b26", "#3f5a4c"], accent: "#e2c98f", text: "#f4f1e8"}
     sand:    {bg: ["#f3e9dc", "#e0cdb4"], accent: "#8a5a2b", text: "#2e2117"}
+    schwarzgold: {bg: ["#070707", "#17140e"], accent: "#d4af37", text: "#f6ecd2"}
 
 dashboard:
   # Handy-Seite (Claude-Artifact) – wird jeden Morgen neu veröffentlicht
