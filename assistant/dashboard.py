@@ -17,7 +17,7 @@ from zoneinfo import ZoneInfo
 
 from PIL import Image
 
-from .build import CONTENT, load_plan, pin_description
+from .build import CONTENT, KAMPAGNEN, campaign_pins_for, load_plan, pin_description
 from .design import ROOT, config
 
 WD = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
@@ -38,9 +38,10 @@ def collect(days: int) -> list[dict]:
     for k in range(days):
         d = today + timedelta(days=k)
         folder = CONTENT / d.isoformat()
-        if not (folder / "plan.json").exists():
+        camp = campaign_pins(d.isoformat())
+        if not (folder / "plan.json").exists() and not camp:
             continue
-        plan = load_plan(d.isoformat())
+        plan = load_plan(d.isoformat()) if (folder / "plan.json").exists() else {"pins": [], "videos": []}
         pins = []
         for i, p in enumerate(plan["pins"], 1):
             img = folder / "pins" / f"pin-{i}.png"
@@ -55,6 +56,7 @@ def collect(days: int) -> list[dict]:
                 "hint": p.get("link_hint", ""), "linkType": p.get("link_type", "blog"),
                 "file": f"pin-{d.isoformat()}-{i}.jpg", "img": _jpeg_b64(img),
             })
+        pins += camp
         videos = []
         for v in plan.get("videos", []):
             f = folder / "videos" / f"{v['id']}.mp4"
@@ -69,6 +71,21 @@ def collect(days: int) -> list[dict]:
         out.append({"date": d.isoformat(), "label": label,
                     "long": f"{WD[d.weekday()]}, {d.day:02d}.{d.month:02d}.{d.year}",
                     "pins": pins, "videos": videos})
+    return out
+
+
+def campaign_pins(day: str) -> list[dict]:
+    out = []
+    for name, i, p in campaign_pins_for(day):
+        img = KAMPAGNEN / name / "pins" / f"{i:02d}-{day}.png"
+        if img.exists():
+            out.append({
+                "n": 100 + i, "time": p.get("time", "20:15"), "board": p.get("board", ""),
+                "label": f"Kampagne · {p.get('label', '')}", "focus": True,
+                "title": p["title"], "description": pin_description(p), "alt": p.get("alt_text", ""),
+                "hint": p.get("link_hint", ""), "linkType": p.get("link_type", "pdf"),
+                "file": f"{name}-{i:02d}-{day}.jpg", "img": _jpeg_b64(img),
+            })
     return out
 
 

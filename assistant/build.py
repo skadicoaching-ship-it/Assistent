@@ -119,12 +119,62 @@ def write_overview(day: str, plan: dict, folder: Path) -> None:
     (folder / "UEBERSICHT.md").write_text("\n".join(out), encoding="utf-8")
 
 
+KAMPAGNEN = CONTENT / "kampagnen"
+
+
+def load_campaign(name: str) -> dict:
+    return json.loads((KAMPAGNEN / name / "plan.json").read_text(encoding="utf-8"))
+
+
+def campaign_pins_for(day: str) -> list[tuple[str, int, dict]]:
+    """Alle Kampagnen-Pins, die an diesem Tag erscheinen sollen."""
+    found = []
+    for f in sorted(KAMPAGNEN.glob("*/plan.json")):
+        camp = json.loads(f.read_text(encoding="utf-8"))
+        for i, p in enumerate(camp["pins"], 1):
+            if p.get("date") == day:
+                found.append((f.parent.name, i, p))
+    return found
+
+
+def build_campaign(name: str) -> Path:
+    camp = load_campaign(name)
+    folder = KAMPAGNEN / name
+    pcfg = config()["pinterest"]
+    media_base = (pcfg.get("media_base_url") or "").rstrip("/")
+    rows, md = [], [f"# Kampagne: {camp.get('title', name)}", "", camp.get("intro", ""), ""]
+    for i, pin in enumerate(camp["pins"], 1):
+        pin.setdefault("id", f"{name}-{i}")
+        pin.setdefault("time", camp.get("time", "20:15"))
+        pin.setdefault("board", pcfg["boards"].get(pin.get("pillar"), ""))
+        fname = f"{i:02d}-{pin['date']}.png"
+        render_pin(pin, folder / "pins" / fname)
+        rows.append([pin["title"][:100], f"{media_base}/content/kampagnen/{name}/pins/{fname}" if media_base else "",
+                     pin["board"], "", pin_description(pin), pin.get("link", ""), publish_utc(pin["date"], pin["time"]),
+                     ", ".join(pin.get("keywords", []))])
+        md += [f"## {i}. {pin['date']} · {pin['time']} Uhr · {pin.get('art', '')}", f"![Pin {i}](pins/{fname})", "",
+               f"**Titel:** {pin['title']}", "", f"**Beschreibung:**\n\n{pin_description(pin)}", "",
+               f"**Board:** {pin['board']}  ", f"**Alt-Text:** {pin.get('alt_text', '')}  ",
+               f"**Link:** {pin.get('link_hint', '')}", ""]
+    with open(folder / "pinterest_bulk.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(CSV_HEADER)
+        w.writerows(rows)
+    (folder / "UEBERSICHT.md").write_text("\n".join(md + ["---", f"_{config()['compliance']['disclaimer']}_", ""]),
+                                          encoding="utf-8")
+    return folder
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("day", nargs="?")
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--no-video", action="store_true")
+    ap.add_argument("--kampagne", help="Name des Ordners unter content/kampagnen/")
     a = ap.parse_args()
+    if a.kampagne:
+        print("→", build_campaign(a.kampagne).relative_to(ROOT))
+        return
     days = sorted(p.parent.name for p in CONTENT.glob("*/plan.json")) if a.all else [a.day]
     for day in days:
         print("→", build_day(day, video=not a.no_video).relative_to(ROOT))

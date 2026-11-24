@@ -250,8 +250,89 @@ def draw_gemini(img: Image.Image, cx: float, cy: float, size: int, accent: str, 
     _finish(img, layer, cx, cy, size)
 
 
+def _mix(a: str, b: str, t: float) -> tuple[int, int, int]:
+    ra, rb = hex_rgb(a), hex_rgb(b)
+    return tuple(int(ra[i] + (rb[i] - ra[i]) * t) for i in range(3))
+
+
+def _fir_branch(d, x0, y0, x1, y1, S, col, needle=0.075, w=2):
+    """Tannenzweig von (x0,y0) zur Spitze (x1,y1) mit Nadeln."""
+    dx, dy = x1 - x0, y1 - y0
+    L = math.hypot(dx, dy)
+    ux, uy = dx / L, dy / L
+    d.line((x0, y0, x1, y1), fill=col, width=w)
+    n = int(L / (S * 0.018))
+    for i in range(1, n):
+        t = i / n
+        px, py = x0 + dx * t, y0 + dy * t
+        ln = S * needle * (1 - 0.55 * t)
+        for side in (-1, 1):
+            ang = math.atan2(uy, ux) + side * math.radians(48)
+            d.line((px, py, px + math.cos(ang) * ln, py + math.sin(ang) * ln), fill=col, width=max(1, w - 1))
+
+
+def draw_sun(img: Image.Image, cx: float, cy: float, size: int, accent: str, bg: str) -> None:
+    """Yule-Sonne über einem Tannenzweig-Bogen (angelehnt an das Buchcover, eigene Zeichnung)."""
+    layer, d, k = _ss_layer(size)
+    S = size * k
+    c = S / 2
+    gold = hex_rgb(accent) + (255,)
+    sage = _mix(bg, "#7f9a7a", 0.35) + (255,)
+    green = _mix(bg, "#2f4a3a", 0.85 if sum(hex_rgb(bg)) > 380 else 0.0) + (255,)
+    if sum(hex_rgb(bg)) <= 380:
+        green = (122, 156, 118, 255)
+    d.ellipse((c - S * 0.36, S * 0.06, c + S * 0.36, S * 0.78), fill=sage)
+    sc, sr = S * 0.36, S * 0.14
+    for a in range(16):
+        ang = a * math.pi / 8
+        r1, r2 = sr * 1.25, sr * (1.6 if a % 2 == 0 else 1.45)
+        d.line((c + math.cos(ang) * r1, sc + math.sin(ang) * r1, c + math.cos(ang) * r2, sc + math.sin(ang) * r2), fill=gold, width=int(S * 0.012))
+    d.ellipse((c - sr, sc - sr, c + sr, sc + sr), fill=gold)
+    w = int(S * 0.01)
+    for sx in (-1, 1):
+        _fir_branch(d, c, S * 0.72, c + sx * S * 0.46, S * 0.56, S, green, 0.08, w)
+        _fir_branch(d, c, S * 0.74, c + sx * S * 0.4, S * 0.82, S, green, 0.07, w)
+        _fir_branch(d, c + sx * S * 0.12, S * 0.7, c + sx * S * 0.3, S * 0.9, S, green, 0.05, w)
+    red = (181, 69, 47, 255)
+    for bx, by in ((-0.03, 0.7), (0.025, 0.69), (0.0, 0.735), (-0.055, 0.735), (0.05, 0.73)):
+        rr = S * 0.022
+        d.ellipse((c + S * bx - rr, S * by - rr, c + S * bx + rr, S * by + rr), fill=red)
+    _finish(img, layer, cx, cy, size)
+
+
+def draw_candle(img: Image.Image, cx: float, cy: float, size: int, accent: str, bg: str) -> None:
+    r_, g_, b_ = hex_rgb(accent)
+    glow = Image.new("RGBA", (size * 2, size * 2), (0, 0, 0, 0))
+    ga = 60 if sum(hex_rgb(bg)) > 380 else 140
+    ImageDraw.Draw(glow).ellipse((size * 0.75, size * 0.45, size * 1.25, size * 0.95), fill=(r_, g_, b_, ga))
+    glow = glow.filter(ImageFilter.GaussianBlur(size // 9))
+    img.alpha_composite(glow, (int(cx - size), int(cy - size)))
+    layer, d, k = _ss_layer(size)
+    S = size * k
+    c = S / 2
+    gold = (r_, g_, b_, 255)
+    light = sum(hex_rgb(bg)) > 380
+    wax = (250, 244, 230, 255) if not light else (255, 252, 244, 255)
+    w = int(S * 0.012)
+    d.rounded_rectangle((c - S * 0.13, S * 0.36, c + S * 0.13, S * 0.84), int(S * 0.02), fill=wax, outline=gold, width=w)
+    d.ellipse((c - S * 0.13, S * 0.33, c + S * 0.13, S * 0.39), fill=wax, outline=gold, width=w)
+    d.rounded_rectangle((c + S * 0.05, S * 0.36, c + S * 0.09, S * 0.5), int(S * 0.02), fill=wax, outline=gold, width=max(1, w // 2))
+    d.line((c, S * 0.36, c, S * 0.3), fill=(60, 45, 30, 255), width=w)
+    flame = [(c, S * 0.1), (c + S * 0.06, S * 0.22), (c + S * 0.045, S * 0.29), (c, S * 0.31), (c - S * 0.045, S * 0.29), (c - S * 0.06, S * 0.22)]
+    d.polygon(flame, fill=gold)
+    d.polygon([(c, S * 0.19), (c + S * 0.025, S * 0.26), (c, S * 0.295), (c - S * 0.025, S * 0.26)], fill=(255, 247, 220, 255))
+    d.ellipse((c - S * 0.3, S * 0.8, c + S * 0.3, S * 0.92), fill=hex_rgb(bg) + (255,), outline=gold, width=w)
+    for sx in (-1, 1):
+        _fir_branch(d, c + sx * S * 0.15, S * 0.86, c + sx * S * 0.46, S * 0.78, S,
+                    ((47, 74, 58, 255) if light else (122, 156, 118, 255)), 0.06, w)
+    _finish(img, layer, cx, cy, size)
+
+
+MOTIFS = ("owl", "moon", "gemini", "sun", "candle")
+
+
 def draw_motif(img: Image.Image, kind: str, cx: float, cy: float, size: int, accent: str, bg: str) -> bool:
-    fn = {"owl": draw_owl, "moon": draw_full_moon, "gemini": draw_gemini}.get(kind)
+    fn = {"owl": draw_owl, "moon": draw_full_moon, "gemini": draw_gemini, "sun": draw_sun, "candle": draw_candle}.get(kind)
     if not fn:
         return False
     fn(img, cx, cy, size, accent, bg)

@@ -24,6 +24,15 @@ im Repo liegt. Nichts automatisch posten.
 - Zielgruppe ist vorrangig `haupt_zielgruppe` (Self-Care-Frau 30–50):
   gestresst, sehnt sich nach Ruhe, Ritualen und bewusstem Jahresabschluss.
 
+## Kampagnen
+
+Unter `content/kampagnen/<name>/plan.json` liegen vorgeplante Pin-Serien mit
+festem Datum pro Pin (z. B. `yule-raunaechte`: 30 Pins zum PDF „Yule & die
+Raunächte“, 25.11.–24.12., je 20:15 Uhr). Sie erscheinen automatisch auf der
+Handy-Seite am jeweiligen Tag. Beim Planen der Tages-Pins vorher in die Kampagne
+schauen und dasselbe Thema am selben Tag nicht doppeln.
+Bauen: `python3 -m assistant.build --kampagne <name>`.
+
 ## Tagesroutine
 
 1. **Trends recherchieren** (WebSearch, aktuelle Woche/Monat):

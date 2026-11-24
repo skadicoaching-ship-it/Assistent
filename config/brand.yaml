@@ -4,8 +4,9 @@
 # ─────────────────────────────────────────────────────────────
 
 brand:
-  name: "Skadi"                     # TODO: dein Markenname
+  name: "Skadi Darkmoon"
   handle: "@skadi"                  # TODO: dein Insta/TikTok-Handle
+  signatur: "Skadi Darkmoon"        # steht unten auf jedem Pin (falls keine Blog-URL)
   blog_url: ""                      # TODO: z.B. https://dein-blog.de
   language: de
   anrede: du                        # du | Sie
@@ -24,11 +25,14 @@ angebot:
 # Die meisten Inhalte bewerben dieses Produkt. Nach Ablauf (bis_datum)
 # wieder auf den normalen Mix wechseln oder neuen Fokus eintragen.
 fokus:
-  produkt: "Rauhnächte-Journal (PDF)"
+  produkt: "Yule & die Raunächte (PDF-Begleitbuch & Journal)"
   beschreibung: >
-    Druckbares Journal für die 12 Rauhnächte (25.12.–6.1.) mit dem
-    13-Wünsche-Ritual, täglichen Journaling-Fragen, Räucher-Anleitung,
-    Jahresrückblick und Intentionen für das neue Jahr.
+    "Yule & die Raunächte – Dein Begleiter durch die dunkle Zeit" (77 Seiten PDF):
+    Yule & Wintersonnenwende, Herkunft der Raunächte & Zählweisen, Wilde Jagd,
+    alte Bräuche & Verbote, Vorbereitungs-Checkliste, Räuchermischung &
+    Ausräuchern, Abendritual, 13-Wünsche-Ritual mit Wunschkärtchen, Journal für
+    13 Nächte (24.12.–6.1.: Thema, Monat, Loslass-Impuls, Affirmation,
+    Räuchervorschlag), Jahresblick. Schreibweise im Buch: "Raunächte".
   bis_datum: "2027-01-05"
   pins_pro_tag: 3            # von 5 Pins führen 3 zum Journal
   video_cta: true            # jedes Video endet mit Hinweis aufs Journal
@@ -103,6 +107,8 @@ design:
     rose:    {bg: ["#3b1a2a", "#7a3b55"], accent: "#f0c9a0", text: "#fbf3ee"}
     salbei:  {bg: ["#1d2b26", "#3f5a4c"], accent: "#e2c98f", text: "#f4f1e8"}
     sand:    {bg: ["#f3e9dc", "#e0cdb4"], accent: "#8a5a2b", text: "#2e2117"}
+    yule:    {bg: ["#fbf6ec", "#efe4cd"], accent: "#a07a26", text: "#2f4a3a"}
+    tanne:   {bg: ["#12231a", "#24402f"], accent: "#d4af37", text: "#f4ecd8"}
     schwarzgold: {bg: ["#070707", "#17140e"], accent: "#d4af37", text: "#f6ecd2"}
 
 dashboard:
